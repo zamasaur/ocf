@@ -57,8 +57,8 @@ window.addEventListener("load", () => {
     
     //FUNCTIONS
     async function doSearch(model, view) {
-        var message = view.search.value;
-        model.worker.postMessage(message);
+        view.counter.innerText = 'Loading...'
+        model.worker.postMessage(view.search.value);
     }
     
     async function getNext(model, view) {        
