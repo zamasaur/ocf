@@ -1,26 +1,8 @@
 window.addEventListener("load", () => {
     
-    const options = {
-        // isCaseSensitive: false,
-        // includeScore: false,
-        // shouldSort: true,
-        // includeMatches: false,
-        // findAllMatches: false,
-        minMatchCharLength: 3,
-        // location: 0,
-        threshold: 0.5,
-        // distance: 100,
-        // useExtendedSearch: false,
-        ignoreLocation: true,
-        // ignoreFieldNorm: false,
-        // fieldNormWeight: 1,
-        keys: [
-            "question"
-        ]
-    };
+    const baseUrl = (window.location.href.substring(0, window.location.href.lastIndexOf("/")))+'/';
     
-    const fuse = new Fuse(list, options);
-    
+    //INITIALIZE
     var result = [];
     list.forEach(element => {
         result.push({item: element});
@@ -30,8 +12,8 @@ window.addEventListener("load", () => {
         query: '',
         result: result,
         index: -1,
-        fuse: fuse,
-        total: result.length
+        total: result.length,
+        worker: new Worker(importLocalScripts(workerScript.toString())+'#?p='+baseUrl)
     }
     var view = {
         search: document.querySelector('#search>textarea'),
@@ -41,6 +23,13 @@ window.addEventListener("load", () => {
     }
     
     reset(model, view);
+    
+    //SET LISTENERS
+    model.worker.addEventListener('message', event => {
+        model.index = 0;
+        model.result = event.data;
+        renderResult(model, view);
+    });
     
     view.search.addEventListener("keypress", (event) => {     
         var code = (event.keyCode ? event.keyCode : e.which);
@@ -66,15 +55,10 @@ window.addEventListener("load", () => {
         }
     });
     
-    async function doSearch(model, view) {        
-        return new Promise((resolve, reject) => {
-            window.setTimeout(() => {
-                model.index = 0;
-                model.result = model.fuse.search(view.search.value);
-                renderResult(model, view);
-                resolve();
-            }, 0, model, view);
-        });
+    //FUNCTIONS
+    async function doSearch(model, view) {
+        var message = view.search.value;
+        model.worker.postMessage(message);
     }
     
     async function getNext(model, view) {        
@@ -127,6 +111,41 @@ window.addEventListener("load", () => {
     
     function setCounter(model, view){
         view.counter.innerText = (model.index + 1) + '/' + (model.result.length > 0 ? model.result.length : model.total);
+    }
+    
+    //WORKER
+    function importLocalScripts(string){
+        return URL.createObjectURL(new Blob(["(" + string + ")()"], { type: 'text/javascript' }));
+    }
+    function workerScript(){
+        const baseUrl = new URL(self.location.toString().replace("#?", "?")).searchParams.get('p');
+        self.importScripts(baseUrl+'data.js');
+        self.importScripts(baseUrl+'fuse.js');
+        
+        const options = {
+            // isCaseSensitive: false,
+            // includeScore: false,
+            // shouldSort: true,
+            // includeMatches: false,
+            // findAllMatches: false,
+            minMatchCharLength: 3,
+            // location: 0,
+            threshold: 0.5,
+            // distance: 100,
+            // useExtendedSearch: false,
+            ignoreLocation: true,
+            // ignoreFieldNorm: false,
+            // fieldNormWeight: 1,
+            keys: [
+                "question"
+            ]
+        };
+        
+        const fuse = new Fuse(list, options);
+        
+        self.addEventListener('message', event => {
+            self.postMessage(fuse.search(event.data));
+        });
     }
     
 });
