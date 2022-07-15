@@ -1,0 +1,84 @@
+body{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    font-family: "Lucida Console";
+}
+
+#root{
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+}
+
+#search{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 20vh;
+}
+
+#search>textarea{
+    display: block;
+    width: calc(100vw - 5vmin);
+    height: calc(20vh - 5vmin);
+    resize: none;
+}
+
+#result{
+    display: flex;
+    width: 100vw;
+    height: 75vh;
+}
+
+#question{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50vw;
+    height: 75vh;
+}
+
+#question>textarea{
+    display: block;
+    width: calc(50vw - 5vmin);
+    height: calc(75vh - 5vmin);
+    resize: none;
+}
+
+#answer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50vw;
+    height: 75vh;
+}
+
+#answer>textarea{
+    display: block;
+    width: calc(50vw - 5vmin);
+    height: calc(75vh - 5vmin);
+    resize: none;
+}
+
+textarea{
+    box-sizing: border-box;
+    padding: 4vmin;
+    font-size: 4vmin;
+    border: 1vmin solid grey;
+    color: white;
+    background-color: black;
+}
+
+#counter{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 5vh;
+    font-size: 4vmin;
+    color: white;
+}
